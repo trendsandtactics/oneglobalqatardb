@@ -6,7 +6,6 @@ import { fileURLToPath } from 'url';
 import pool from './db.js';
 import dotenv from 'dotenv';
 import { checkCredentials, signToken, requireAuth } from '../api/lib/auth.js';
-import { checkRateLimit, clientIp } from '../api/lib/rateLimit.js';
 import { ALLOWED_IMAGE_TYPES } from '../api/lib/imageTypes.js';
 dotenv.config();
 
@@ -76,9 +75,6 @@ async function initDb() {
 
 // POST /api/login
 app.post('/api/login', async (req, res) => {
-  if (!checkRateLimit(`login:${clientIp(req)}`, 5, 15 * 60 * 1000)) {
-    return res.status(429).json({ error: 'Too many login attempts. Try again in 15 minutes.' });
-  }
   const { email, password } = req.body || {};
   console.log('Login attempt for email:', email);
   if (!email || !password) return res.status(400).json({ error: 'Email and password required' });

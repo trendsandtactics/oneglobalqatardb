@@ -1,14 +1,9 @@
 import { checkCredentials, signToken } from './lib/auth.js';
-import { checkRateLimit, clientIp } from './lib/rateLimit.js';
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     res.setHeader('Allow', 'POST');
     return res.status(405).json({ error: 'Method not allowed' });
-  }
-
-  if (!checkRateLimit(`login:${clientIp(req)}`, 5, 15 * 60 * 1000)) {
-    return res.status(429).json({ error: 'Too many login attempts. Try again in 15 minutes.' });
   }
 
   const { email, password } = req.body || {};
